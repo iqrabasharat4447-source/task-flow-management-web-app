@@ -1,0 +1,58 @@
+# TaskFlow
+
+TaskFlow is a responsive team task management application with an interactive overview, task list, drag-and-drop Kanban board, project workspace, monthly calendar, team directory, notifications, and preferences.
+
+## Features
+
+- Create, edit, complete, filter, search, and delete tasks; data persists across refreshes in browser local storage.
+- Board cards can be dragged across workflow columns. Dates, priority, assignee, and project are editable.
+- Create and remove projects, see task counts and completion progress, and assign members.
+- Month navigation and task details from the calendar; team invitation link is a clear in-app copy-flow alternative.
+- Theme switch, responsive navigation, empty states, toast feedback, and confirmation for clearing local data.
+- Express API starter with validated registration/login, password hashing, scoped task/project routes, and Prisma/MySQL schema.
+
+## Stack
+
+React, TypeScript, Vite, Tailwind CSS, Lucide, Recharts, Express, Prisma, and MySQL.
+
+## Requirements and setup
+
+Install Node.js 20 or later and npm, then install MySQL. The project is client-first: the frontend works locally without API credentials. The current React interface uses browser local storage; the Express API and MySQL schema ship separately as a server API and are not yet connected to the UI.
+
+```sh
+cp .env.example .env
+# Set DATABASE_URL and JWT_SECRET in .env for the API setup.
+npm install
+npm run dev
+```
+
+Vite serves the app at http://localhost:5173. Start the API separately with `npm run server` (port 4000). Configure a MySQL connection string such as `mysql://USER:PASSWORD@localhost:3306/taskflow` in `DATABASE_URL`, then initialize the schema:
+
+```sh
+npx prisma migrate dev --name init
+npm run db:generate
+```
+
+For local development, `npm run build` creates `dist/`; `npm run preview` serves the production build. `npm run test` runs the test suite.
+
+## Environment
+
+See `.env.example`. Keep `.env` out of version control. `DATABASE_URL` is only used by the server-side Prisma client. `CLIENT_ORIGIN` limits cross-origin API access.
+
+## Screenshots
+
+Add screenshots of the dashboard, board, and mobile view here after running the app.
+
+## Deployment
+
+Build the static client using `npm run build` and deploy `dist/` to a static host with SPA fallback enabled. Deploy the Express service to a Node host and provision a managed MySQL database; configure environment variables in the host dashboard, run Prisma migrations during release, and set the production `CLIENT_ORIGIN` and `JWT_SECRET`.
+
+## Authentication and API notes
+
+The API hashes passwords with bcrypt and issues short-lived signed JWTs. Protected routes require an `Authorization: Bearer` token and check project membership or task assignment. Set a unique `JWT_SECRET` of at least 32 characters. Before public deployment, add rate limiting, refresh/session rotation, email verification, robust account recovery, and API integration tests. The frontend currently has no login/register screens and uses local storage instead of API auth. The invite flow copies an in-app link; it does not send email.
+
+## Tests
+
+`npm run test` runs the Vitest domain suite. It covers task creation/update, status transitions, overdue behavior, and project membership checks. API integration tests for registration, task CRUD, and authorization are still needed before production deployment.
+
+In the implementation environment, the domain checks were also run directly with Node and passed. A Vite build and the Vitest runner could not be launched there because npm was unavailable.
